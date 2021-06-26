@@ -1,0 +1,108 @@
+# Instructions
+# 1. Update your /etc/hosts file...
+#   > 127.0.0.1 gitea drone
+# 2. Run gitea + gitea-db and generate the oauth application
+#   > docker-compose -p gitea-drone up gitea gitea-db
+#   - Navigate to http://gitea:3000 to finish the installation and register a user
+#   - Create a oauth application as described here: https://docs.drone.io/installation/providers/gitea/
+#   - Set the Redirect uri to http://drone:8000/login
+# 3. Update the docker-compose file with the client_id and client_secret
+# 4. Fire up all of the services
+#    > docker-compose -p gitea-drone up
+# 5. Create a new repositry in gitea: http://gitea:3000
+# 6. Visit the drone url and connect with gitea: http://drone:8000
+# 7. Activate the resposity in drone
+# 8. Push a test .drone.yml file in the repository:
+#
+# ---
+# kind: pipeline
+# type: docker
+# name: default
+# 
+# steps:
+# - name: greeting
+#   image: node:alpine
+#   commands:
+#     - node -e 'console.log("Hello, world")'
+#
+# 9. When you push to the repository the drone webhook should kick in and run the greeting pipline
+
+version: "3"
+
+services:
+
+  gitea:
+    image: gitea/gitea:1.10.0
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - ROOT_URL=http://gitea:3000
+      - DB_TYPE=mysql
+      - DB_HOST=gitea-db:3306
+      - DB_NAME=gitea
+      - DB_USER=root
+      - DB_PASSWD=gitea
+      - SKIP_TLS_VERIFY=true
+    restart: always
+    volumes:
+      - ./volumes/gitea-app:/data
+    links:
+      - gitea-db
+    ports:
+      - 22:22
+      - 3000:3000
+
+  gitea-db:
+    image: mysql
+    restart: always
+    volumes: 
+      -  ./volumes/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=gitea
+      - MYSQL_DATABASE=gitea
+
+  drone:
+    image: drone/drone:1.6.2
+    ports:
+      - 8000:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./volumes/drone:/var/lib/drone/
+    restart: always
+    depends_on:
+      - gitea
+    links:
+      - gitea
+    environment:
+      - DRONE_AGENTS_ENABLED=true
+      - DRONE_GITEA_CLIENT_ID=520e77a0-18cc-428e-832f-0508695d5d2d
+      - DRONE_GITEA_CLIENT_SECRET=P7M2uRHCoP4eEnT6J9OdUfZJiOaUu6mMNhxXh9tqAL4=
+      - DRONE_GITEA_SERVER=http://gitea:3000
+      - DRONE_GIT_ALWAYS_AUTH=false
+      - DRONE_TLS_AUTOCERT=false
+      - DRONE_SERVER_PORT=:8000
+      - DRONE_SERVER_HOST=drone:8000
+      - DRONE_SERVER_PROTO=http
+      - DRONE_RPC_SECRET=secret
+      - DRONE_RUNNER_NETWORKS=gitea-drone_default
+
+  drone-runner-docker:
+    image: drone/drone-runner-docker:latest
+    restart: always
+    depends_on:
+      - drone
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - drone
+      - gitea
+    environment:
+      - DRONE_RPC_HOST=drone:8000
+      - DRONE_RPC_PROTO=http
+      - DRONE_RPC_SECRET=secret
+      - DRONE_RUNNER_NAME=drone-runner-docker
+      - DRONE_UI_USERNAME=test
+      - DRONE_UI_PASSWORD=test
+      - DRONE_RUNNER_NETWORKS=gitea-drone_default
+
+
