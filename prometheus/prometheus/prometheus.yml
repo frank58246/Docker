@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 15s # 設定預設 scrape 的拉取間隔時間
+  external_labels: # 外通溝通時標示在 time series 或 Alert 的 Labels。
+    monitor: 'codelab-monitor'
+
+scrape_configs: # 設定 scrape jobs
+  - job_name: 'prometheus'
+    scrape_interval: 5s # 若設定間隔時間，將會覆蓋 global 的預設時間。
+    static_configs:
+      - targets: ['host.docker.internal:9100']

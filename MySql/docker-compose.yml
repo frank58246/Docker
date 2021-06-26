@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+   db:
+     image: mcr.microsoft.com/mssql/server:2017-latest
+     volumes:
+       - mssqldb:/opt/var/mssql/data
+     environment:
+       - ACCEPT_EULA=Y
+       - SA_PASSWORD=yourStrong@Password
+       - COMPOSE_CONVERT_WINDOWS_PATHS=1
+     restart: always
+     ports:
+       - "1433:1433"
+
+   api:
+     depends_on:
+       - db
+     entrypoint: ["./wait_for.sh", "db:1433", "-t", "3600", "--", "execute", "api"]
+     image: api:latest
+     ports:
+       - "80:80"
+     restart: always
+
+volumes:
+    mssqldb:
+        external: true
