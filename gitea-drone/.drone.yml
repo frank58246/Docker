@@ -1,0 +1,14 @@
+kind: pipeline
+type: docker
+name: default
+ 
+steps:
+- name: docker
+  image: mcr.microsoft.com/dotnet/sdk:3.1
+  commands: 
+    - dotnet build WebApplication1.sln -c Release
+    - dotnet test WebApplication1Tests/WebApplication1Tests.csproj 
+
+# trigger:
+  # event:
+  # - pull_request
