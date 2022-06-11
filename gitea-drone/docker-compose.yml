@@ -85,6 +85,8 @@ services:
       - DRONE_SERVER_PROTO=http
       - DRONE_RPC_SECRET=secret
       - DRONE_RUNNER_NETWORKS=gitea-drone_default
+      - DRONE_USER_CREATE=username:frank58246-gitea,admin:true
+
 
   drone-runner-docker:
     image: drone/drone-runner-docker:latest
@@ -104,5 +106,6 @@ services:
       - DRONE_UI_USERNAME=test
       - DRONE_UI_PASSWORD=test
       - DRONE_RUNNER_NETWORKS=gitea-drone_default
+      - DRONE_USER_CREATE=username:frank58246-gitea,admin:true
 
 

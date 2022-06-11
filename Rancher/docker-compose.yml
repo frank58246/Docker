@@ -1,0 +1,15 @@
+version: '3.7'
+services:
+  rancher:
+    container_name: rancher
+    image: rancher/rancher:v2.5.14
+    privileged: true 
+    ports:
+      - 8880:80
+      - 8443:443
+      - 30001:30001
+      - 30002:30002
+      - 30003:30003
+      - 30004:30004
+
+# admin/12345678  password
