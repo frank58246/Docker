@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      initContainers:
+      # Since k8s 1.9.4, config maps mount read-only volumes. Since the Docker image also writes to the config file,
+      # the file must be mounted as read-write. We use init containers to copy from the config map read-only
+      # path, to a read-write path
+      - name: "rabbitmq-config"
+        image: busybox:1.32.0
+        volumeMounts:
+        - name: rabbitmq-config
+          mountPath: /tmp/rabbitmq
+        - name: rabbitmq-config-rw
+          mountPath: /etc/rabbitmq
+        command:
+        - sh
+        - -c
+        # the newline is needed since the Docker image entrypoint scripts appends to the config file
+        - cp /tmp/rabbitmq/rabbitmq.conf /etc/rabbitmq/rabbitmq.conf && echo '' >> /etc/rabbitmq/rabbitmq.conf;
+          cp /tmp/rabbitmq/enabled_plugins /etc/rabbitmq/enabled_plugins
+      volumes:
+      - name: rabbitmq-config
+        configMap:
+          name: rabbitmq-config
+          optional: false
+          items:
+          - key: enabled_plugins
+            path: "enabled_plugins"
+          - key: rabbitmq.conf
+            path: "rabbitmq.conf"
+      - name: rabbitmq-config-rw
+        emptyDir: {}            
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.7.28
+        volumeMounts:
+        - name: rabbitmq-config
+          mountPath: /etc/rabbitmq
+        env:
+        - name: RABBITMQ_DEFAULT_PASS
+          value: admin
+        - name: RABBITMQ_DEFAULT_USER
+          value: admin      
+        livenessProbe:
+          exec:
+            # This is just an example. There is no "one true health check" but rather
+            # several rabbitmq-diagnostics commands that can be combined to form increasingly comprehensive
+            # and intrusive health checks.
+            # Learn more at https://www.rabbitmq.com/monitoring.html#health-checks.
+            #
+            # Stage 2 check:
+            command: ["rabbitmq-diagnostics", "status"]
+                     
+        ports:
+        - name: amqp
+          containerPort: 5672
+          protocol: TCP
+        - name: management
+          containerPort: 15672
+          protocol: TCP
+        - name: prometheus
+          containerPort: 15692
+          protocol: TCP
+        - name: epmd
+          containerPort: 4369
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 500m
+            memory: 1000Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+spec:
+  type: NodePort 
+  selector:
+    app: rabbitmq
+  ports:
+  - name: amqp
+    port: 5672
+    protocol: TCP
+    nodePort: 30002
+  - name: cluster-rpc
+    port: 15672
+    protocol: TCP
+    nodePort: 30003

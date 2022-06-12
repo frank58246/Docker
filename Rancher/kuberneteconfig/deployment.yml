@@ -16,7 +16,10 @@ spec:
     spec:
       containers:
       - name: rabbitmq-poc
-        image: frank58246/log-test
+        image: frank58246/rabbitmq-poc:0612a
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: staging
         ports:
         - containerPort: 80
         resources:
