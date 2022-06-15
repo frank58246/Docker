@@ -25,6 +25,7 @@ spec:
           mountPath: /tmp/rabbitmq
         - name: rabbitmq-config-rw
           mountPath: /etc/rabbitmq
+     
         command:
         - sh
         - -c
@@ -42,13 +43,20 @@ spec:
           - key: rabbitmq.conf
             path: "rabbitmq.conf"
       - name: rabbitmq-config-rw
-        emptyDir: {}            
+        emptyDir: {}   
+      - name: rabbitmq-data
+        persistentVolumeClaim:
+          claimName: rabbitmq-data     
+      hostname: rmq-host     
       containers:
       - name: rabbitmq
         image: rabbitmq:3.8.34
         volumeMounts:
         - name: rabbitmq-config
           mountPath: /etc/rabbitmq
+        - name: rabbitmq-data
+          mountPath: "/var/lib/rabbitmq/mnesia"       
+         
         env:
         - name: RABBITMQ_DEFAULT_PASS
           value: admin
@@ -104,3 +112,26 @@ spec:
     port: 15672
     protocol: TCP
     nodePort: 30003
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+data:
+  # append additional plugin to list here
+  enabled_plugins: |
+    [ rabbitmq_management, rabbitmq_prometheus].
+  rabbitmq.conf: |
+    listeners.tcp.default = 5672
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 3Gi

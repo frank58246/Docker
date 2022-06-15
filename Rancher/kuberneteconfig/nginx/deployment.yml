@@ -29,7 +29,6 @@ spec:
           claimName: local-path-pvc
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
