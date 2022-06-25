@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rabbitmq-poc
+  name: rabbitmq-consumer
   labels:
-    app: rabbitmq-poc
+    app: rabbitmq-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rabbitmq-poc
+      app: rabbitmq-consumer
   template:
     metadata:
       labels:
-        app: rabbitmq-poc
+        app: rabbitmq-consumer
     spec:
       containers:
-      - name: rabbitmq-poc
-        image: frank58246/rabbitmq-poc:0625
+      - name: rabbitmq-consumer
+        image: frank58246/rabbitmq-consumer:0625
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: staging
@@ -35,11 +35,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: rabbitmq-poc-service
+  name: rabbitmq-consumer-service
 spec:
   type: NodePort 
   selector:
-    app: rabbitmq-poc
+    app: rabbitmq-consumer
   ports:
   - name: http
     protocol: TCP
