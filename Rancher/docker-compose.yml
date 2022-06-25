@@ -3,6 +3,7 @@ services:
   rancher:
     container_name: rancher
     image: rancher/rancher:v2.5.14
+    restart: always
     privileged: true 
     ports:
       - 8880:80

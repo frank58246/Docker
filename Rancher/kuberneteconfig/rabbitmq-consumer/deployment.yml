@@ -16,10 +16,12 @@ spec:
     spec:
       containers:
       - name: rabbitmq-consumer
-        image: frank58246/rabbitmq-consumer:0625
+        image: frank58246/rabbitmq-consumer:0625a
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: staging
+        - name: UNIQUE_QUEUE
+          value: "y"          
         ports:
         - containerPort: 80
         resources:

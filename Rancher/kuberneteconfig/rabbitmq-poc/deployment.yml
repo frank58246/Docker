@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: rabbitmq-poc
-        image: frank58246/rabbitmq-poc:0625
+        image: frank58246/rabbitmq-poc:0625a
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: staging
@@ -44,4 +44,4 @@ spec:
   - name: http
     protocol: TCP
     port: 80
-    nodePort: 30006
+    nodePort: 30005
