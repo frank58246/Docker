@@ -8,15 +8,15 @@ export let options = {
 
       { duration: "5s", target: 5 },
 
-      // Stay at rest on 5 VUs for 10s
-      { duration: "10s", target: 1000 },
+      // // Stay at rest on 5 VUs for 10s
+      // { duration: "10s", target: 1000 },
 
-      // Ramp-down from 5 to 0 VUs for 5s
-      { duration: "5s", target: 0 }
+      // // Ramp-down from 5 to 0 VUs for 5s
+      // { duration: "5s", target: 0 }
   ]
 };
 
 export default function () {
-  const response = http.get("http://host.docker.internal:3000/?orgId=1", {headers: {Accepts: "application/json"}});
+  const response = http.get("http://host.docker.internal:30005/Message/SendUpdateHouse", {headers: {Accepts: "application/json"}});
   check(response, { "status is 200": (r) => r.status === 200 });
 };
