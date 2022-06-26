@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: rabbitmq-poc
-        image: frank58246/rabbitmq-poc:0625a
+        image: frank58246/rabbitmq-poc:0626c
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: staging
