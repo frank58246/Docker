@@ -17,6 +17,19 @@ export let options = {
 };
 
 export default function () {
-  const response = http.get("http://host.docker.internal:30005/Message/SendUpdateHouse", {headers: {Accepts: "application/json"}});
+  // const response = http.post("http://localhost:5052/api/kafka?message=22", {headers: {Accepts: "application/json"}});
+
+  //const response = http.post("https://localhost:5001/Message/SendUpdateHouse", {headers: {Accepts: "application/json"}},);
+
+  const url = 'http://test.k6.io/login';
+  const payload = JSON.stringify({"caption":"string","upPrice":0,"downPrice":0,"updateTime":"2022-06-28T16:50:17.750Z"});
+
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  var response = http.post(url, payload, params);
   check(response, { "status is 200": (r) => r.status === 200 });
 };
