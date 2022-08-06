@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: rabbitmq
   labels:
@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       app: rabbitmq
+  serviceName: rabbitmq-service       
   template:
     metadata:
       labels:
@@ -47,7 +48,6 @@ spec:
       - name: rabbitmq-data
         persistentVolumeClaim:
           claimName: rabbitmq-data     
-      hostname: rmq-host     
       containers:
       - name: rabbitmq
         image: rabbitmq:3.8.34

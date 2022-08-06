@@ -9,6 +9,6 @@ services:
       - ./data:/var/opt/mssql/data
     restart: always
     environment: 
-      - SA_PASSWORD=qazwsx123456!
+      - SA_PASSWORD=1234qwer
       - ACCEPT_EULA=Y
 
