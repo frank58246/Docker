@@ -1,25 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rabbitmq-poc
+  name: rabbitmq-consumer
   labels:
-    app: rabbitmq-poc
+    app: rabbitmq-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rabbitmq-poc
+      app: rabbitmq-consumer
   template:
     metadata:
       labels:
-        app: rabbitmq-poc
+        app: rabbitmq-consumer
     spec:
       containers:
-      - name: rabbitmq-poc
-        image: frank58246/rabbitmq-poc:0626c
+      - name: rabbitmq-consumer
+        image: frank58246/rabbitmq-consumer:0626c
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: staging
+        - name: UNIQUE_QUEUE
+          value: "y"          
+        - name: DELAY_SECOND
+          value: "0"           
         ports:
         - containerPort: 80
         resources:
@@ -35,13 +39,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: rabbitmq-poc-service
+  name: rabbitmq-consumer-service
 spec:
   type: NodePort 
   selector:
-    app: rabbitmq-poc
+    app: rabbitmq-consumer
   ports:
   - name: http
     protocol: TCP
     port: 80
-    nodePort: 30005
+    nodePort: 30006

@@ -3,6 +3,7 @@ services:
   rancher:
     container_name: rancher
     image: rancher/rancher:v2.5.14
+    restart: always
     privileged: true 
     restart: always
     ports:
@@ -13,5 +14,6 @@ services:
       - 30003:30003
       - 30004:30004
       - 30005:30005
+      - 30006:30006
 
 # admin/12345678  password

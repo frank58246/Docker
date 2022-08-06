@@ -59,7 +59,7 @@ spec:
          
         env:
         - name: RABBITMQ_DEFAULT_PASS
-          value: admin
+          value: 1234qwer
         - name: RABBITMQ_DEFAULT_USER
           value: admin      
         livenessProbe:
